@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                onPressed:_showDialog,
+                onPressed:() async { final result = await _upload();_showDialog(result);},
                 child: Text('Upload Image'),
               ),
             ],
@@ -84,8 +84,9 @@ final String texto="";
 // file = await ImagePicker.pickImage(source: ImageSource.gallery);
  }
 */
-void _upload() async{
-    print("enviando imagem...");
+Future<String> _upload() async{
+  await Future.delayed(Duration(seconds:2));
+  print("enviando imagem...");
     var uri = Uri.parse(uploadURL);
     var request = new http.MultipartRequest("POST", uri);
     request.files.add( new http.MultipartFile.fromBytes("imageFile", _image.readAsBytesSync(), filename: "photo.jpg"));
@@ -101,20 +102,18 @@ void _upload() async{
          animal = "Gato";
       }
     });
-    
+  return animal;
 }
 
-
 // user defined function
-  void _showDialog() {
+  void _showDialog(String texto) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Alert Dialog title"),
-          content: new Text("Alert Dialog body"),
+          title: new Text(texto),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
