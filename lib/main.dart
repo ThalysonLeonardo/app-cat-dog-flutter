@@ -50,7 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                onPressed:() async { final result = await _upload();_showDialog(result);},
+                onPressed:() async {final result = await _upload();_mostrarResposta(context,result);
+                },
                 child: Text('Upload Image'),
               ),
             ],
@@ -71,10 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// My IPv4 : 192.168.43.171 
-final String pythonEndPoint = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
+// My IPv4 : 192.168.43.171
 final String uploadURL = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
-final String nodeEndPoint = 'http://192.168.43.171:3000/image';
 File file;
 String animal="";
 final String texto="";
@@ -105,25 +104,25 @@ Future<String> _upload() async{
   return animal;
 }
 
-// user defined function
-  void _showDialog(String texto) {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text(texto),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+void _mostrarResposta(BuildContext context, String texto){
+  Widget okButton = FlatButton(
+    child: Text("OK"),
+    onPressed: () {
+      Navigator.of(context).pop();
+    },
+  );
+  AlertDialog alerta = AlertDialog(
+    title: Text("A resposta é:"),
+    content: Text(texto),
+    actions: [
+      okButton,
+    ],
+  );
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return alerta;
+    },
+  );
+}
