@@ -31,7 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
  
 
   Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    //var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       _image = image;
@@ -50,7 +51,11 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                onPressed:() async { final result = await _upload();_showDialog(result);},
+                onPressed:() async { 
+                  final result = await _upload();
+                  print("resultado:"+result);
+                  _showDialog(context,result);
+                },
                 child: Text('Upload Image'),
               ),
             ],
@@ -97,23 +102,27 @@ Future<String> _upload() async{
       if(value.contains('Cachorro')){
         print("Cachorro");
         animal = "Cachorro";
-      }else{
+      }else if(value.contains('Gato')){
         print("Gato");
-         animal = "Gato";
+        animal = "Gato";
+      }else{
+        print("Sem resposta do servidor");
+        animal = "Sem resposta do servidor";
       }
     });
   return animal;
 }
 
 // user defined function
-  void _showDialog(String texto) {
+  void _showDialog(BuildContext context,String texto) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text(texto),
+          title: new Text("Este animal é um:"),
+          content: new Text(texto+"!"),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
