@@ -6,14 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:async/async.dart';
 import 'package:load/load.dart';
 
-//void main() => runApp(MyApp());
-void main() {
+void main() => runApp(MyApp());
+/*void main() {
   runApp(
     LoadingProvider(
       child: MyApp(),
     ),
   );
 }
+*/
 File _image;
 
 class MyApp extends StatelessWidget {
@@ -72,9 +73,11 @@ class _MyHomePageState extends State<MyHomePage> {
                      _showNullAlert(context);
 
                   }else{
-
+                    //showLoadingDialog();
+                    //showCustomLoadingWidget(Container()); // custom dialog
                     String result = await _upload();
                     print("resultado:" + result);
+                    //hideLoadingDialog();
                     _showDialog(context);
 
                   }
@@ -107,8 +110,6 @@ String animal="";
 
 
 Future<String> _upload() async{
-    showLoadingDialog();
-    showCustomLoadingWidget(Container()); // custom dialog
     print("enviando imagem...");
     var uri = Uri.parse(uploadURL);
     var request = new http.MultipartRequest("POST", uri);
@@ -129,6 +130,7 @@ Future<String> _upload() async{
           animal =  "Sem resposta do servidor";
       } 
     });
+    
   return animal;
 }
 /**
@@ -148,13 +150,10 @@ Future<String> _upload() async{
       }
  */
 
-// user defined function
   void _showDialog(BuildContext context) {
-    // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        hideLoadingDialog();
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Este animal é um:"),
