@@ -29,6 +29,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
  
+/*
+ void _choose() async {
+   file = await ImagePicker.pickImage(source: ImageSource.camera);
+// file = await ImagePicker.pickImage(source: ImageSource.gallery);
+ }
+*/
 
   Future getImage() async {
     //var image = await ImagePicker.pickImage(source: ImageSource.camera);
@@ -52,8 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               RaisedButton(
                 onPressed:() async { 
-                  final result = await _upload();
-                  print("resultado:"+result);
+                  String result = await _upload();
+                  print("resultado:" + result);
                   _showDialog(context,result);
 
                 },
@@ -80,34 +86,35 @@ class _MyHomePageState extends State<MyHomePage> {
 // My IPv4 : 192.168.43.171
 final String uploadURL = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
 File file;
-String animal="";
-final String texto="";
-/*
- void _choose() async {
-   file = await ImagePicker.pickImage(source: ImageSource.camera);
-// file = await ImagePicker.pickImage(source: ImageSource.gallery);
- }
-*/
+String animal;
+
+
 Future<String> _upload() async{
-  await Future.delayed(Duration(seconds:2));
+  
   print("enviando imagem...");
     var uri = Uri.parse(uploadURL);
     var request = new http.MultipartRequest("POST", uri);
     request.files.add( new http.MultipartFile.fromBytes("imageFile", _image.readAsBytesSync(), filename: "photo.jpg"));
     print("aguardando resposta...");
     var response = await request.send();
-    print(response.statusCode);
+    
     response.stream.transform(utf8.decoder).listen((value){
-      if(value.contains('Cachorro')){
+      print(value);
+      if(value.contains("Cachorro")){
         print("Cachorro");
-        animal = "Cachorro";
-      }else if(value.contains('Gato')){
-        print("Gato");
-        animal = "Gato";
+        animal =  "Cachorro";
+        
       }else{
-        print("Sem resposta do servidor");
-        animal = "Sem resposta do servidor";
-      }
+        if(value.contains("Gato")){
+          print("Gato");
+          animal =  "Gato";
+          
+        }else{
+          print("Sem resposta do servidor");
+          animal =  "Sem resposta do servidor";
+
+        }
+      } 
     });
   return animal;
 }
@@ -122,7 +129,7 @@ Future<String> _upload() async{
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Este animal é um:"),
-          content: new Text(texto+"!"),
+          content: new Text(texto + "!"),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
