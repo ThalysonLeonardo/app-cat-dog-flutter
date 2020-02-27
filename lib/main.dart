@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   final result = await _upload();
                   print("resultado:"+result);
                   _showDialog(context,result);
+
                 },
                 child: Text('Upload Image'),
               ),
@@ -76,10 +77,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// My IPv4 : 192.168.43.171 
-final String pythonEndPoint = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
+// My IPv4 : 192.168.43.171
 final String uploadURL = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
-final String nodeEndPoint = 'http://192.168.43.171:3000/image';
 File file;
 String animal="";
 final String texto="";
@@ -113,6 +112,7 @@ Future<String> _upload() async{
   return animal;
 }
 
+
 // user defined function
   void _showDialog(BuildContext context,String texto) {
     // flutter defined function
@@ -136,3 +136,4 @@ Future<String> _upload() async{
       },
     );
   }
+
