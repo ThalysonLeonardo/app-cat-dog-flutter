@@ -4,8 +4,16 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:async/async.dart';
+import 'package:load/load.dart';
 
-void main() => runApp(MyApp());
+//void main() => runApp(MyApp());
+void main() {
+  runApp(
+    LoadingProvider(
+      child: MyApp(),
+    ),
+  );
+}
 File _image;
 
 class MyApp extends StatelessWidget {
@@ -13,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Cats & Dogs',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -37,8 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
 */
 
   Future getImage() async {
-    //var image = await ImagePicker.pickImage(source: ImageSource.camera);
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    //var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       _image = image;
@@ -57,13 +65,22 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                onPressed:() async { 
-                  String result = await _upload();
-                  print("resultado:" + result);
-                  _showDialog(context,result);
+                onPressed:()
+                async { 
+                  if(_image == null){
+
+                     _showNullAlert(context);
+
+                  }else{
+
+                    String result = await _upload();
+                    print("resultado:" + result);
+                    _showDialog(context);
+
+                  }
 
                 },
-                child: Text('Upload Image'),
+                child: Text('Analisar'),
               ),
             ],
           ),
@@ -86,12 +103,13 @@ class _MyHomePageState extends State<MyHomePage> {
 // My IPv4 : 192.168.43.171
 final String uploadURL = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
 File file;
-String animal;
+String animal="";
 
 
 Future<String> _upload() async{
-  
-  print("enviando imagem...");
+    showLoadingDialog();
+    showCustomLoadingWidget(Container()); // custom dialog
+    print("enviando imagem...");
     var uri = Uri.parse(uploadURL);
     var request = new http.MultipartRequest("POST", uri);
     request.files.add( new http.MultipartFile.fromBytes("imageFile", _image.readAsBytesSync(), filename: "photo.jpg"));
@@ -100,36 +118,47 @@ Future<String> _upload() async{
     
     response.stream.transform(utf8.decoder).listen((value){
       print(value);
-      if(value.contains("Cachorro")){
-        print("Cachorro");
-        animal =  "Cachorro";
-        
-      }else{
-        if(value.contains("Gato")){
-          print("Gato");
+      switch (value) {
+        case '{"prediction":"Cachorro"}':
+          animal =  "Cachorro";
+          break;
+          case '{"prediction":"Gato"}':
           animal =  "Gato";
-          
-        }else{
-          print("Sem resposta do servidor");
+          break;
+        default:
           animal =  "Sem resposta do servidor";
-
-        }
       } 
     });
   return animal;
 }
+/**
+ * if(value.contains("Cachorro")){
+        print("Cachorro");
+        animal =  "Cachorro";
+        
+      }else if(value.contains("Gato")){
+          print("Gato");
+          animal =  "Gato";
+          
+      }else{
+        print("Sem resposta do servidor");
+        animal =  "Sem resposta do servidor";
 
+        
+      }
+ */
 
 // user defined function
-  void _showDialog(BuildContext context,String texto) {
+  void _showDialog(BuildContext context) {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        hideLoadingDialog();
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Este animal é um:"),
-          content: new Text(texto + "!"),
+          content: new Text(animal + "!"),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
@@ -144,3 +173,26 @@ Future<String> _upload() async{
     );
   }
 
+
+ void _showNullAlert(BuildContext context) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Selecione uma imagem!"),
+          
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
