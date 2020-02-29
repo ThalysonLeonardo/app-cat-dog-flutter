@@ -50,9 +50,12 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
-                onPressed:() async {final result = await _upload();_mostrarResposta(context,result);
+                onPressed:() async {
+                final result = await _upload();
+                print("--"+result+"--");
+                _mostrarResposta(context,result);
                 },
-                child: Text('Upload Image'),
+                child: Text('Enviar Imagem'),
               ),
             ],
           ),
@@ -73,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 // My IPv4 : 192.168.43.171
-final String uploadURL = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
+  final String uploadURL = 'https://cat-or-dog-api.herokuapp.com/image/predict/';
 File file;
 String animal="";
 final String texto="";
@@ -84,7 +87,6 @@ final String texto="";
  }
 */
 Future<String> _upload() async{
-  await Future.delayed(Duration(seconds:2));
   print("enviando imagem...");
     var uri = Uri.parse(uploadURL);
     var request = new http.MultipartRequest("POST", uri);
@@ -94,17 +96,20 @@ Future<String> _upload() async{
     print(response.statusCode);
     response.stream.transform(utf8.decoder).listen((value){
       if(value.contains('Cachorro')){
-        print("Cachorro");
+        print("<Cachorro>");
         animal = "Cachorro";
-      }else{
-        print("Gato");
+      }else if(value.contains('Gato')){
+        print("<Gato>");
          animal = "Gato";
+      }else{
+        print("<Sem-Resposta-Servidor>");
+        animal = "Sem-Resposta-Servidor";
       }
     });
   return animal;
 }
 
-void _mostrarResposta(BuildContext context, String texto){
+void _showMessage(BuildContext context, String texto){
   Widget okButton = FlatButton(
     child: Text("OK"),
     onPressed: () {
@@ -113,7 +118,7 @@ void _mostrarResposta(BuildContext context, String texto){
   );
   AlertDialog alerta = AlertDialog(
     title: Text("A resposta é:"),
-    content: Text(texto),
+    content: Text(texto), contentTextStyle: TextStyle(color: Colors.black),
     actions: [
       okButton,
     ],
@@ -123,6 +128,29 @@ void _mostrarResposta(BuildContext context, String texto){
     context: context,
     builder: (BuildContext context) {
       return alerta;
+    },
+  );
+}
+
+void _mostrarResposta(BuildContext context,String texto) {
+  // flutter defined function
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      // return object of type Dialog
+      return AlertDialog(
+        title: Text("> A resposta é:< "),
+        content: Text(texto), contentTextStyle: TextStyle(color: Colors.black),
+        actions: <Widget>[
+          // usually buttons at the bottom of the dialog
+          new FlatButton(
+            child: new Text("Close"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
     },
   );
 }
